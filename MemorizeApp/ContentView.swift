@@ -11,14 +11,14 @@ struct ContentView: View {
     
     @State var emojiTheme: EmojiTheme = .faces
     var cardCount: Int {
-        emojis.count
+        return emojis.count
     }
     var emojis: [String] {
-        emojiOptions[emojiTheme]!
+        return emojiOptions[emojiTheme]!
     }
     
     var body: some View {
-        VStack {
+        return VStack {
             Text("Memorize!").bold().font(.largeTitle)
             ScrollView {
                 cards
@@ -30,9 +30,10 @@ struct ContentView: View {
     }
     
     var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
-            ForEach(0..<cardCount, id: \.self) {index in
-                CardView(content: emojis[index]).aspectRatio(2/3, contentMode: .fit)
+        return LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
+            ForEach((0..<2*cardCount).shuffled(), id: \.self) {index in
+                CardView(content: emojis[index % cardCount])
+                    .aspectRatio(2/3, contentMode: .fit)
             }
             .foregroundColor(.accentColor)
         }
@@ -40,18 +41,18 @@ struct ContentView: View {
     
     
     func emojiThemeSetter(to theme: EmojiTheme) -> some View {
-        Button(action: {
+        return Button(action: {
             emojiTheme = theme
         }, label: {
             VStack {
-                Text(theme.rawValue)
+                Text(theme.rawValue).font(.title3)
                 themeIcons[theme]
             }
         })
     }
     
     var emojiThemeControls: some View {
-        HStack {
+        return HStack {
             emojiThemeSetter(to: .faces)
             Spacer()
             emojiThemeSetter(to: .balls)
@@ -83,7 +84,7 @@ struct ContentView: View {
 
 struct CardView: View {
     let content: String
-    @State var isFaceUp = true
+    @State var isFaceUp = false
     
     var body: some View {
         ZStack {
