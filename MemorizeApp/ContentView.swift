@@ -10,7 +10,9 @@ import SwiftUI
 struct ContentView: View {
     
     @State var emojiTheme: EmojiTheme = .faces
-    @State var cardCount = 0
+    var cardCount: Int {
+        emojis.count
+    }
     var emojis: [String] {
         emojiOptions[emojiTheme]!
     }
@@ -22,13 +24,13 @@ struct ContentView: View {
                 cards
             }
             Spacer()
-            cardCountControls
+            emojiThemeControls
         }
         .padding(10)
     }
     
     var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))]) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
             ForEach(0..<cardCount, id: \.self) {index in
                 CardView(content: emojis[index]).aspectRatio(2/3, contentMode: .fit)
             }
@@ -36,35 +38,6 @@ struct ContentView: View {
         }
     }
     
-    var cardCountControls: some View {
-        HStack {
-            cardRemover
-            Spacer()
-            emojiThemeControls
-            Spacer()
-            cardAdder
-        }
-        .imageScale(.large)
-        .font(.title)
-    }
-    
-    
-    func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
-        Button(action: {
-            cardCount += offset
-        }, label: {
-            Image(systemName: symbol)
-        })
-        .disabled(cardCount + offset < 0 || cardCount + offset > emojis.count)
-    }
-    
-    var cardRemover: some View {
-        cardCountAdjuster(by: -1, symbol: "rectangle.stack.fill.badge.minus")
-    }
-    
-    var cardAdder: some View {
-        cardCountAdjuster(by: +1, symbol: "rectangle.stack.fill.badge.plus")
-    }
     
     func emojiThemeSetter(to theme: EmojiTheme) -> some View {
         Button(action: {
@@ -80,21 +53,26 @@ struct ContentView: View {
     var emojiThemeControls: some View {
         HStack {
             emojiThemeSetter(to: .faces)
+            Spacer()
             emojiThemeSetter(to: .balls)
+            Spacer()
             emojiThemeSetter(to: .animals)
         }
+        .imageScale(.large)
+        .font(.largeTitle)
     }
+    
     enum EmojiTheme: String {
         case faces, balls, animals
     }
     
-    var emojiOptions: [EmojiTheme: [String]] = [
-        .faces: ["😀", "🤣", "😌", "😛", "🥸", "😩", "🤯"],
+    let emojiOptions: [EmojiTheme: [String]] = [
+        .faces: ["😀", "🤣", "😌", "😛", "🥸", "🤯"],
         .balls: ["⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🎱"],
-        .animals: ["🐶", "🐱", "🐭", "🐹", "🦊", "🐻", "🦁"]
+        .animals: ["🐶", "🐭", "🦊", "🐻", "🦁"]
     ]
     
-    var themeIcons: [EmojiTheme: Image] = [
+    let themeIcons: [EmojiTheme: Image] = [
         .faces: Image(systemName: "face.smiling.fill"),
         .animals: Image(systemName: "pawprint.fill"),
         .balls: Image(systemName: "basketball.fill")
