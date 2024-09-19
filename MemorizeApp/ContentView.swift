@@ -13,34 +13,37 @@ struct ContentView: View {
             CardView()
             CardView(isFaceUp: true)
         }
+        .foregroundColor(.orange)
+        .padding(10)
     }
 }
 
 
 
 struct CardView: View {
-    var isFaceUp: Bool = false
+    @State var isFaceUp = false
     var body: some View {
-        if isFaceUp {
-            ZStack {
-                RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
-                    .foregroundColor(.white)
-                RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
-                    .strokeBorder(lineWidth: 10)
+        ZStack {
+            let base = RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
+            if isFaceUp {
+                base.fill(.white)
+                base.strokeBorder(lineWidth: 10)
                 Text("😁").font(.largeTitle)
+            } else {
+                base
             }
-            .foregroundColor(.orange)
-            .padding(10)
-        } else {
-            ZStack {
-                RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
-            }
-            .foregroundColor(.orange)
-            .padding(10)
+        }
+        .onTapGesture {
+            print("lmao")
+            isFaceUp.toggle()
         }
     }
 }
-    
+
+
+
+
+
 #Preview {
     ContentView()
 }
