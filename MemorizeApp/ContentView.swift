@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct ContentView: View {
-    let emojis = ["😀", "😁", "😅", "😥", "🥵", "😎", "🤨", "🧐"]
-    @State var cardCount = 3
+    
+    @State var emojiTheme: EmojiTheme = .faces
+    @State var cardCount = 0
+    var emojis: [String] {
+        emojiOptions[emojiTheme]!
+    }
     
     var body: some View {
         VStack {
+            Text("Memorize!").bold().font(.largeTitle)
             ScrollView {
                 cards
             }
@@ -27,7 +32,7 @@ struct ContentView: View {
             ForEach(0..<cardCount, id: \.self) {index in
                 CardView(content: emojis[index]).aspectRatio(2/3, contentMode: .fit)
             }
-            .foregroundColor(.orange)
+            .foregroundColor(.accentColor)
         }
     }
     
@@ -35,10 +40,12 @@ struct ContentView: View {
         HStack {
             cardRemover
             Spacer()
+            emojiThemeControls
+            Spacer()
             cardAdder
         }
         .imageScale(.large)
-        .font(.largeTitle)
+        .font(.title)
     }
     
     
@@ -48,7 +55,7 @@ struct ContentView: View {
         }, label: {
             Image(systemName: symbol)
         })
-        .disabled(cardCount + offset < 1 || cardCount + offset > emojis.count)
+        .disabled(cardCount + offset < 0 || cardCount + offset > emojis.count)
     }
     
     var cardRemover: some View {
@@ -58,6 +65,40 @@ struct ContentView: View {
     var cardAdder: some View {
         cardCountAdjuster(by: +1, symbol: "rectangle.stack.fill.badge.plus")
     }
+    
+    func emojiThemeSetter(to theme: EmojiTheme) -> some View {
+        Button(action: {
+            emojiTheme = theme
+        }, label: {
+            VStack {
+                Text(theme.rawValue)
+                themeIcons[theme]
+            }
+        })
+    }
+    
+    var emojiThemeControls: some View {
+        HStack {
+            emojiThemeSetter(to: .faces)
+            emojiThemeSetter(to: .balls)
+            emojiThemeSetter(to: .animals)
+        }
+    }
+    enum EmojiTheme: String {
+        case faces, balls, animals
+    }
+    
+    var emojiOptions: [EmojiTheme: [String]] = [
+        .faces: ["😀", "🤣", "😌", "😛", "🥸", "😩", "🤯"],
+        .balls: ["⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🎱"],
+        .animals: ["🐶", "🐱", "🐭", "🐹", "🦊", "🐻", "🦁"]
+    ]
+    
+    var themeIcons: [EmojiTheme: Image] = [
+        .faces: Image(systemName: "face.smiling.fill"),
+        .animals: Image(systemName: "pawprint.fill"),
+        .balls: Image(systemName: "basketball.fill")
+    ]
 }
 
 
@@ -70,7 +111,6 @@ struct CardView: View {
         ZStack {
             let base = RoundedRectangle(cornerRadius: 10)
             Group {
-//                base.fill(.white)
                 base.strokeBorder(lineWidth: 3)
                 Text(content).font(.largeTitle)
             }
@@ -78,7 +118,6 @@ struct CardView: View {
             base.opacity(isFaceUp ? 0 : 1)
         }
         .onTapGesture {
-//            print("lmao")
             isFaceUp.toggle()
         }
     }
