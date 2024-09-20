@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  MemorizeGameView.swift
 //  MemorizeApp
 //
 //  Created by Vladimir on 19.09.2024.
@@ -7,15 +7,10 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct MemorizeGameView: View {
+    @ObservedObject var viewModel: EmojiMemorizeGame
     
     @State var emojiTheme: EmojiTheme = .faces
-    var cardCount: Int {
-        return emojis.count
-    }
-    var emojis: [String] {
-        return emojiOptions[emojiTheme]!
-    }
     
     var body: some View {
         return VStack {
@@ -30,15 +25,21 @@ struct ContentView: View {
     }
     
     var cards: some View {
-        return LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
-            ForEach((0..<2*cardCount).shuffled(), id: \.self) {index in
-                CardView(content: emojis[index % cardCount])
+        return LazyVGrid(
+            columns: [GridItem(.adaptive(minimum: 75), spacing: 0)],
+            spacing: 0) {
+                ForEach(viewModel.cards.indices, id: \.self) {index in
+                    CardView(viewModel.cards[index])
                     .aspectRatio(2/3, contentMode: .fit)
+                    .padding(5)
             }
             .foregroundColor(.accentColor)
         }
     }
     
+    func shuffle() {
+        viewModel.shuffle()
+    }
     
     func emojiThemeSetter(to theme: EmojiTheme) -> some View {
         return Button(action: {
@@ -58,6 +59,9 @@ struct ContentView: View {
             emojiThemeSetter(to: .balls)
             Spacer()
             emojiThemeSetter(to: .animals)
+            Button("shuffle"){
+                viewModel.shuffle()
+            }
         }
         .imageScale(.large)
         .font(.largeTitle)
@@ -83,22 +87,25 @@ struct ContentView: View {
 
 
 struct CardView: View {
-    let content: String
-    @State var isFaceUp = false
+    let card: MemorizeGame<String>.Card
     
     var body: some View {
         ZStack {
             let base = RoundedRectangle(cornerRadius: 10)
             Group {
                 base.strokeBorder(lineWidth: 3)
-                Text(content).font(.largeTitle)
+                Text(card.content)
+                    .font(.system(size: 200))
+                    .minimumScaleFactor(0.01)
+                    .aspectRatio(1, contentMode: .fit)
             }
-            .opacity(isFaceUp ? 1 : 0)
-            base.opacity(isFaceUp ? 0 : 1)
+            .opacity(card.isFaceUp ? 1 : 0)
+            base.opacity(card.isFaceUp ? 0 : 1)
         }
-        .onTapGesture {
-            isFaceUp.toggle()
-        }
+    }
+    
+    init(_ card: MemorizeGame<String>.Card) {
+        self.card = card
     }
 }
 
@@ -107,5 +114,5 @@ struct CardView: View {
 
 
 #Preview {
-    ContentView()
+    MemorizeGameView(viewModel: EmojiMemorizeGame())
 }
