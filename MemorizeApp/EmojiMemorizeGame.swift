@@ -9,56 +9,48 @@ import SwiftUI
 
 class EmojiMemorizeGame: ObservableObject {
     
-    private static let defaultTheme = Theme(name: "Faces",
-                                            numberOfPairsOfCards: 5,
-                                            content: ["😀", "🤣", "😌", "😛", "🥸", "🤯", "🥰", "😡", "😎", "🥶"],
-                                            color: "orange")
+    @Published private var gameModel = MemorizeGameModel<String>(theme: MemorizeGameModel.defaultTheme)
     
-    private var themes: [Theme] = [defaultTheme] + defaultThemes
+    var themes = MemorizeGameModel<String>.defaultThemes
     
-    var themeId: String = defaultTheme.id
-    
-    var theme: Theme<String> {
-        if let potentialTheme = themes[themeId] {
-            potentialTheme
-        } else {
-            EmojiMemorizeGame.defaultTheme
-        }
+    var cards: [MemorizeGameModel<String>.MemorizeGame<String>.Card] {
+        return gameModel.game.cards
     }
     
-    @Published private var model = MemorizeGame(numberOfPairsOfCards: defaultTheme.numberOfPairsOfCards,
-                                                cardsContents: defaultTheme.content)
-    
-    var cards: [MemorizeGame<String>.Card] {
-        return model.cards
-    }
     var score: Int {
-        model.score
+        gameModel.game.score
     }
     
-    init(themes: [Theme<String>] = [defaultTheme] + defaultThemes,
-         themeId: String = defaultTheme.id,
-         model: MemorizeGame<String> = MemorizeGame(numberOfPairsOfCards: defaultTheme.numberOfPairsOfCards,
-                                                    cardsContents: defaultTheme.content)) {
-        self.themes = [EmojiMemorizeGame.defaultTheme] + defaultThemes + themes
-        self.themeId = themeId
-        self.model = model
+    var themeId: String {
+        gameModel.theme.id
+    }
+    
+    var theme: MemorizeGameModel<String>.Theme<String> {
+        gameModel.theme
+    }
+    
+    init(themes: [MemorizeGameModel<String>.Theme<String>] = MemorizeGameModel<String>.defaultThemes) {
+        self.themes = themes
+        self.gameModel = MemorizeGameModel<String>(theme: themes[0])
+    }
+    
+    init(extraThemes: [MemorizeGameModel<String>.Theme<String>]) {
+        self.themes = MemorizeGameModel<String>.defaultThemes + extraThemes
+        self.gameModel = MemorizeGameModel<String>(theme: themes[0])
     }
     
     // MARK: - Intents
     func newGame() {
-        var potentialNewTheme = themes.randomElement() ?? EmojiMemorizeGame.defaultTheme
+        var potentialNewTheme = themes.randomElement() ?? MemorizeGameModel<String>.defaultTheme
         if potentialNewTheme.content.count < 2 {
-            potentialNewTheme = EmojiMemorizeGame.defaultTheme
+            potentialNewTheme = MemorizeGameModel<String>.defaultTheme
         }
-        model = MemorizeGame(numberOfPairsOfCards: potentialNewTheme.numberOfPairsOfCards,
-                             cardsContents: potentialNewTheme.content)
-        themeId = potentialNewTheme.id
-        print(themeId)
+        gameModel = MemorizeGameModel<String>(theme: potentialNewTheme)
     }
     
-    func choose(_ card: MemorizeGame<String>.Card) {
-        model.choose(card)
+    func choose(_ card: MemorizeGameModel<String>.MemorizeGame<String>.Card) {
+        gameModel.game.choose(card)
+        if gameModel.game.allMatched {newGame()}
     }
     
 }
@@ -71,29 +63,13 @@ fileprivate extension Array where Element: Identifiable {
     }
 }
 
-
-
-private let defaultThemes = [
-    Theme(name: "Cars",
-          content: ["🚗", "🚕", "🚙", "🚎", "🚌", "🏎️", "🚓", "🚑"],
-          color: "black"),
-    Theme(name: "Fruits",
-          numberOfPairsOfCards: 8,
-          content: ["🍏", "🍎", "🍐", "🍊", "🍋", "🍋‍🟩", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈"],
-          color: "red"),
-    Theme(name: "Animals",
-          content: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊"]),
-    Theme(name: "Balls",
-          content: ["⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🎱"],
-          color: "orange")
-]
-
 extension Color {
     init(fromString str: String?) {
         switch str {
         case "orange": self = .orange
         case "black": self = .black
         case "red": self = .red
+        case "gray": self = .gray
         default: self = .accentColor
         }
     }

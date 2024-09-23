@@ -22,6 +22,7 @@ struct MemorizeGameView: View {
                 viewModel.newGame()
             }
             .font(.largeTitle)
+            .foregroundColor(Color(fromString: viewModel.theme.color))
         }
         .padding(10)
     }
@@ -32,7 +33,7 @@ struct MemorizeGameView: View {
             spacing: 0) {
                 ForEach(viewModel.cards) {card in
                         CardView(card)
-                            .aspectRatio(2/3, contentMode: .fit)
+                        .aspectRatio(2/3, contentMode: .fit)
                             .padding(5)
                             .onTapGesture {
                                 viewModel.choose(card)
@@ -46,7 +47,7 @@ struct MemorizeGameView: View {
 
 
 struct CardView: View {
-    let card: MemorizeGame<String>.Card
+    let card: MemorizeGameModel<String>.MemorizeGame<String>.Card
     
     var body: some View {
         ZStack {
@@ -65,7 +66,7 @@ struct CardView: View {
         .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
     }
     
-    init(_ card: MemorizeGame<String>.Card) {
+    init(_ card: MemorizeGameModel<String>.MemorizeGame<String>.Card) {
         self.card = card
     }
 }
@@ -75,7 +76,5 @@ struct CardView: View {
 
 
 #Preview {
-    MemorizeGameView(viewModel: EmojiMemorizeGame(themes: [
-        Theme(name: "Ints", content: ["1", "2"])
-    ]))
+    MemorizeGameView(viewModel: EmojiMemorizeGame())
 }

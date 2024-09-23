@@ -7,86 +7,123 @@
 
 import Foundation
 
-struct MemorizeGame<CardContent: Equatable> {
-    private(set) var cards: [Card]
-    private(set) var score: Int = 0
+
+struct MemorizeGameModel<CardConent: Equatable> {
     
-    init(numberOfPairsOfCards: Int, cardsContents: [CardContent]) {
-        cards = []
-        let shuffledConent = cardsContents.shuffled()
-        for pairIndex in 0..<max(numberOfPairsOfCards, 2) {
-            let content = shuffledConent[pairIndex]
-            cards.append(Card(content: content, id: "\(pairIndex + 1)a"))
-            cards.append(Card(content: content, id: "\(pairIndex + 1)b"))
+    var game: MemorizeGame<CardConent>
+    let theme: Theme<CardConent>
+    
+    init(theme: Theme<CardConent>) {
+        self.theme = theme
+        game = MemorizeGame<CardConent>(numberOfPairsOfCards: theme.numberOfPairsOfCards, cardsContents: theme.content)
+    }
+    
+    struct MemorizeGame<CardContent: Equatable> {
+        
+        private(set) var cards: [Card]
+        private(set) var score: Int = 0
+        var allMatched: Bool { cards.allSatisfy { $0.isMatched} }
+        
+        init(numberOfPairsOfCards: Int, cardsContents: [CardContent]) {
+            cards = []
+            let shuffledConent = cardsContents.shuffled()
+            for pairIndex in 0..<max(numberOfPairsOfCards, 2) {
+                let content = shuffledConent[pairIndex]
+                cards.append(Card(content: content, id: "\(pairIndex + 1)a"))
+                cards.append(Card(content: content, id: "\(pairIndex + 1)b"))
+            }
+            cards.shuffle()
         }
-        cards.shuffle()
-    }
-    
-    var indexOfOneAndOnly: Int? {
-        get { cards.indices.filter{ index in cards[index].isFaceUp }.only }
-        set { cards.indices.forEach { index in
-            if cards[index].isFaceUp { cards[index].alreadySeen = true }
-            cards[index].isFaceUp = (newValue == index)
-        } }
-    }
-    
-    mutating func choose(_ card: Card) {
-        if let chosenIndex = cards.firstIndex(where: {$0.id == card.id})
-        {
-            if !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched
+        
+        var indexOfOneAndOnly: Int? {
+            get { cards.indices.filter{ index in cards[index].isFaceUp }.only }
+            set { cards.indices.forEach { index in
+                if cards[index].isFaceUp { cards[index].alreadySeen = true }
+                cards[index].isFaceUp = (newValue == index)
+            } }
+        }
+        
+        mutating func choose(_ card: Card) {
+            if let chosenIndex = cards.firstIndex(where: {$0.id == card.id})
             {
-                if let potentialMatchIndex = indexOfOneAndOnly
+                if !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched
                 {
-                    if cards[chosenIndex].content == cards[potentialMatchIndex].content
+                    if let potentialMatchIndex = indexOfOneAndOnly
                     {
-                        cards[chosenIndex].isMatched = true
-                        cards[potentialMatchIndex].isMatched = true
-                        score += 2
+                        if cards[chosenIndex].content == cards[potentialMatchIndex].content
+                        {
+                            cards[chosenIndex].isMatched = true
+                            cards[potentialMatchIndex].isMatched = true
+                            score += 2
+                        }
+                        else
+                        {
+                            var descore = 0
+                            if cards[chosenIndex].alreadySeen {descore += 1}
+                            if cards[potentialMatchIndex].alreadySeen {descore += 1}
+//                            score = max(0, score - descore)
+                            score -= descore
+                        }
                     }
                     else
                     {
-                        var descore = 0
-                        if cards[chosenIndex].alreadySeen {descore += 1}
-                        if cards[potentialMatchIndex].alreadySeen {descore += 1}
-                        score = max(0, score - descore)
+                        indexOfOneAndOnly = chosenIndex
                     }
+                    cards[chosenIndex].isFaceUp = true
                 }
-                else
-                {
-                    indexOfOneAndOnly = chosenIndex
-                }
-                cards[chosenIndex].isFaceUp = true
             }
         }
-    }
-    
-    private func index(of card: Card) -> Int? {
-        for index in cards.indices {
-            if cards[index].id == card.id {
-                return index
+        
+        private func index(of card: Card) -> Int? {
+            for index in cards.indices {
+                if cards[index].id == card.id {
+                    return index
+                }
             }
-        }
-        return nil
-    }
-    
-//    mutating func shuffle() {
-//        cards.shuffle()
-//    }
-    
-    struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
-        var debugDescription: String {
-            return "\(id): \(content), \(isFaceUp ? "up" : "down") \(isMatched ? "matched" : "")"
+            return nil
         }
         
-        var isFaceUp = false
-        var isMatched = false
-        var alreadySeen = false
-        let content: CardContent
         
-        var id: String
+        struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
+            var debugDescription: String {
+                return "\(id): \(content), \(isFaceUp ? "up" : "down") \(isMatched ? "matched" : "")"
+            }
+            
+            var isFaceUp = false
+            var isMatched = false
+            var alreadySeen = false
+            let content: CardContent
+            
+            var id: String
+        }
     }
+    
+    struct Theme<CardContent>: Identifiable {
+        
+        
+        let numberOfPairsOfCards: Int
+        let content: [CardContent]
+        let color: String?
+        var name: String
+        var id: String {
+            get { name }
+            set { name = newValue}
+        }
+        
+        init(name: String, numberOfPairsOfCards: Int, content: [CardContent], color: String? = nil) {
+            self.numberOfPairsOfCards = min(max(2, numberOfPairsOfCards), content.count)
+            self.content = content
+            self.color = color
+            self.name = name
+        }
+        
+        init(name: String, content: [CardContent], color: String? = nil) {
+            let numberOfPairsOfCards = content.count
+            self.init(name: name, numberOfPairsOfCards: numberOfPairsOfCards, content: content, color: color)
+        }
+    }
+    
 }
-
 
 extension Array {
     var only: Element? {
@@ -94,28 +131,28 @@ extension Array {
     }
 }
 
-struct Theme<T>: Identifiable {
+extension MemorizeGameModel where CardConent == String {
+    static let defaultThemes = [
+        Theme(name: "Faces",
+              numberOfPairsOfCards: 5,
+              content: ["😀", "🤣", "😌", "😛", "🥸", "🤯", "🥰", "😡", "😎", "🥶"],
+              color: "orange"),
+        Theme(name: "Cars",
+              content: ["🚗", "🚕", "🚙", "🚎", "🚌", "🏎️", "🚓", "🚑"],
+              color: "gray"),
+        Theme(name: "Fruits",
+              numberOfPairsOfCards: 8,
+              content: ["🍏", "🍎", "🍐", "🍊", "🍋", "🍋‍🟩", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈"],
+              color: "red"),
+        Theme(name: "Animals",
+              content: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊"]),
+        Theme(name: "Balls",
+              content: ["⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🎱"],
+              color: "orange")
+    ]
     
-    
-    let numberOfPairsOfCards: Int
-    let content: [T]
-    let color: String?
-    var name: String
-    var id: String {
-        get { name }
-        set { name = newValue}
-    }
-    
-    init(name: String, numberOfPairsOfCards: Int, content: [T], color: String? = nil) {
-        self.numberOfPairsOfCards = min(max(2, numberOfPairsOfCards), content.count)
-        self.content = content
-        self.color = color
-        self.name = name
-    }
-    
-    init(name: String, content: [T], color: String? = nil) {
-        let numberOfPairsOfCards = content.count
-        self.init(name: name, numberOfPairsOfCards: numberOfPairsOfCards, content: content, color: color)
-    }
+    static let defaultTheme = Theme(name: "Faces",
+                                    numberOfPairsOfCards: 5,
+                                    content: ["😀", "🤣", "😌", "😛", "🥸", "🤯", "🥰", "😡", "😎", "🥶"],
+                                    color: "orange")
 }
-
