@@ -10,14 +10,11 @@ import SwiftUI
 struct MemorizeGameView: View {
     @ObservedObject var viewModel: EmojiMemorizeGame
     
+    private let aspectRatio: CGFloat = 2/3
     var body: some View {
         return VStack {
             Text("Memorize \(viewModel.themeId)! \(viewModel.score)").bold().font(.largeTitle)
-            ScrollView {
-                cards
-                    .animation(.default, value: viewModel.cards) 
-            }
-            Spacer()
+            cards.animation(.default, value: viewModel.cards)
             Button("NewGame") {
                 viewModel.newGame()
             }
@@ -27,20 +24,13 @@ struct MemorizeGameView: View {
         .padding(10)
     }
     
-    var cards: some View {
-        return LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 75), spacing: 0)],
-            spacing: 0) {
-                ForEach(viewModel.cards) {card in
-                        CardView(card)
-                        .aspectRatio(2/3, contentMode: .fit)
-                            .padding(5)
-                            .onTapGesture {
-                                viewModel.choose(card)
-                            }
-            }
-                .foregroundColor(Color(fromString: viewModel.theme.color))
+    private var cards: some View {
+        AspectVGrid(viewModel.cards, aspectRatio: aspectRatio) {card in
+            CardView(card)
+                .padding(5)
+                .onTapGesture { viewModel.choose(card) }
         }
+        .foregroundColor(Color(fromString: viewModel.theme.color))
     }
 }
 

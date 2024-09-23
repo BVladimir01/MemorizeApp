@@ -70,6 +70,7 @@ extension Color {
         case "black": self = .black
         case "red": self = .red
         case "gray": self = .gray
+        case "brown": self = .brown
         default: self = .accentColor
         }
     }

@@ -141,14 +141,14 @@ extension MemorizeGameModel where CardConent == String {
               content: ["🚗", "🚕", "🚙", "🚎", "🚌", "🏎️", "🚓", "🚑"],
               color: "gray"),
         Theme(name: "Fruits",
-              numberOfPairsOfCards: 8,
+              numberOfPairsOfCards: 10,
               content: ["🍏", "🍎", "🍐", "🍊", "🍋", "🍋‍🟩", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈"],
               color: "red"),
         Theme(name: "Animals",
               content: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊"]),
         Theme(name: "Balls",
               content: ["⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🎱"],
-              color: "orange")
+              color: "brown")
     ]
     
     static let defaultTheme = Theme(name: "Faces",
