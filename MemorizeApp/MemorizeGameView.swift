@@ -10,16 +10,17 @@ import SwiftUI
 struct MemorizeGameView: View {
     @ObservedObject var viewModel: EmojiMemorizeGame
     
-    @State var emojiTheme: EmojiTheme = .faces
-    
     var body: some View {
         return VStack {
             Text("Memorize!").bold().font(.largeTitle)
             ScrollView {
                 cards
+                    .animation(.default, value: viewModel.cards)
             }
             Spacer()
-            emojiThemeControls
+            Button("shuffle") {
+                viewModel.shuffle()
+            }
         }
         .padding(10)
     }
@@ -28,10 +29,15 @@ struct MemorizeGameView: View {
         return LazyVGrid(
             columns: [GridItem(.adaptive(minimum: 75), spacing: 0)],
             spacing: 0) {
-                ForEach(viewModel.cards.indices, id: \.self) {index in
-                    CardView(viewModel.cards[index])
-                    .aspectRatio(2/3, contentMode: .fit)
-                    .padding(5)
+                ForEach(viewModel.cards) {card in
+                    if !card.isMatched {
+                        CardView(card)
+                            .aspectRatio(2/3, contentMode: .fit)
+                            .padding(5)
+                            .onTapGesture {
+                                viewModel.choose(card)
+                            }
+                    }
             }
             .foregroundColor(.accentColor)
         }
@@ -41,47 +47,7 @@ struct MemorizeGameView: View {
         viewModel.shuffle()
     }
     
-    func emojiThemeSetter(to theme: EmojiTheme) -> some View {
-        return Button(action: {
-            emojiTheme = theme
-        }, label: {
-            VStack {
-                Text(theme.rawValue).font(.title3)
-                themeIcons[theme]
-            }
-        })
-    }
     
-    var emojiThemeControls: some View {
-        return HStack {
-            emojiThemeSetter(to: .faces)
-            Spacer()
-            emojiThemeSetter(to: .balls)
-            Spacer()
-            emojiThemeSetter(to: .animals)
-            Button("shuffle"){
-                viewModel.shuffle()
-            }
-        }
-        .imageScale(.large)
-        .font(.largeTitle)
-    }
-    
-    enum EmojiTheme: String {
-        case faces, balls, animals
-    }
-    
-    let emojiOptions: [EmojiTheme: [String]] = [
-        .faces: ["😀", "🤣", "😌", "😛", "🥸", "🤯"],
-        .balls: ["⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🎱"],
-        .animals: ["🐶", "🐭", "🦊", "🐻", "🦁"]
-    ]
-    
-    let themeIcons: [EmojiTheme: Image] = [
-        .faces: Image(systemName: "face.smiling.fill"),
-        .animals: Image(systemName: "pawprint.fill"),
-        .balls: Image(systemName: "basketball.fill")
-    ]
 }
 
 
@@ -93,6 +59,7 @@ struct CardView: View {
         ZStack {
             let base = RoundedRectangle(cornerRadius: 10)
             Group {
+                base.fill(.white)
                 base.strokeBorder(lineWidth: 3)
                 Text(card.content)
                     .font(.system(size: 200))
@@ -102,6 +69,7 @@ struct CardView: View {
             .opacity(card.isFaceUp ? 1 : 0)
             base.opacity(card.isFaceUp ? 0 : 1)
         }
+        .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
     }
     
     init(_ card: MemorizeGame<String>.Card) {
