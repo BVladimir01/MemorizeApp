@@ -12,15 +12,16 @@ struct MemorizeGameView: View {
     
     var body: some View {
         return VStack {
-            Text("Memorize!").bold().font(.largeTitle)
+            Text("Memorize \(viewModel.themeId)! \(viewModel.score)").bold().font(.largeTitle)
             ScrollView {
                 cards
-                    .animation(.default, value: viewModel.cards)
+                    .animation(.default, value: viewModel.cards) 
             }
             Spacer()
-            Button("shuffle") {
-                viewModel.shuffle()
+            Button("NewGame") {
+                viewModel.newGame()
             }
+            .font(.largeTitle)
         }
         .padding(10)
     }
@@ -30,24 +31,16 @@ struct MemorizeGameView: View {
             columns: [GridItem(.adaptive(minimum: 75), spacing: 0)],
             spacing: 0) {
                 ForEach(viewModel.cards) {card in
-                    if !card.isMatched {
                         CardView(card)
                             .aspectRatio(2/3, contentMode: .fit)
                             .padding(5)
                             .onTapGesture {
                                 viewModel.choose(card)
                             }
-                    }
             }
-            .foregroundColor(.accentColor)
+                .foregroundColor(Color(fromString: viewModel.theme.color))
         }
     }
-    
-    func shuffle() {
-        viewModel.shuffle()
-    }
-    
-    
 }
 
 
@@ -82,5 +75,7 @@ struct CardView: View {
 
 
 #Preview {
-    MemorizeGameView(viewModel: EmojiMemorizeGame())
+    MemorizeGameView(viewModel: EmojiMemorizeGame(themes: [
+        Theme(name: "Ints", content: ["1", "2"])
+    ]))
 }
