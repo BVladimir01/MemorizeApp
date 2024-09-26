@@ -11,7 +11,18 @@ struct CardView: View {
     let card: MemorizeGameModel<String>.MemorizeGame<String>.Card
     
     var body: some View {
-        Text(card.content).cardify(isFaceUp: card.isFaceUp, isMatched: card.isMatched)
+        Pie(endAngle: Angle(degrees: 100))
+            .opacity(Constants.pieOpacity)
+            .overlay(
+                Text(card.content)
+                .font(.system(size: Constants.textFontSize))
+                .minimumScaleFactor(Constants.minScaleFactor)
+                .aspectRatio(1, contentMode: .fit)
+//                .rotationEffect(.radians(card.isMatched ? 2 * .pi : 0))
+//                .scaleEffect(card.isMatched ? 1.5 : 1)
+//                .animation(.easeInOut(duration: 1), value: card.isMatched)
+            )
+            .cardify(isFaceUp: card.isFaceUp, isMatched: card.isMatched)
     }
     
     init(_ card: MemorizeGameModel<String>.MemorizeGame<String>.Card) {
@@ -20,14 +31,13 @@ struct CardView: View {
     
     private struct Constants {
         static let textFontSize = CGFloat(200)
-        static let borderWidth = CGFloat(3)
         static let minScaleFactor = CGFloat(0.01)
-        static let cornerRadius = CGFloat(10)
+        static let pieOpacity = 0.6
     }
 }
 
 #Preview {
-    CardView(MemorizeGameModel.MemorizeGame.Card(isFaceUp: true, isMatched: false, alreadySeen: false, content: "X", id: "X"))
+    CardView(MemorizeGameModel.MemorizeGame.Card(isFaceUp: true, isMatched: false, alreadySeen: false, content: "⚽️", id: "X"))
         .padding(20)
         .foregroundColor(.red)
 }

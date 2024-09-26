@@ -7,10 +7,25 @@
 
 import SwiftUI
 
-struct Cardify: ViewModifier {
+struct Cardify: ViewModifier, Animatable {
     
-    let isFaceUp: Bool
+    init(isFaceUp: Bool, isMatched: Bool) {
+        self.isMatched = isMatched
+        self.rotation = isFaceUp ? 0 : .pi
+    }
+    
+    var isFaceUp: Bool {
+        rotation < .pi / 2
+    }
+    
     let isMatched: Bool
+    
+    var rotation: Double
+    
+    var animatableData: Double {
+        get { rotation }
+        set { rotation = newValue }
+    }
     
     func body(content: Content) -> some View {
         ZStack {
@@ -19,20 +34,19 @@ struct Cardify: ViewModifier {
                 base.fill(.white)
                 base.strokeBorder(lineWidth: Constants.borderWidth)
                 content
-                    .font(.system(size: Constants.textFontSize))
-                    .minimumScaleFactor(Constants.minScaleFactor)
-                    .aspectRatio(1, contentMode: .fit)
             }
             .opacity(isFaceUp ? 1 : 0)
             base.opacity(isFaceUp ? 0 : 1)
         }
-        .opacity(isFaceUp || !isMatched ? 1 : 0)
+        .opacity(rotation == .pi && isMatched ? 0 : 1)
+        .animation(.easeInOut, value: rotation == .pi && isMatched)
+        .rotation3DEffect(.radians(rotation),
+                          axis: (x: 0.0, y: 1.0, z: 0.0)
+        )
     }
     
     private struct Constants {
-        static let textFontSize = CGFloat(200)
         static let borderWidth = CGFloat(3)
-        static let minScaleFactor = CGFloat(0.01)
         static let cornerRadius = CGFloat(10)
     }
 }
