@@ -18,9 +18,6 @@ struct CardView: View {
                 .font(.system(size: Constants.textFontSize))
                 .minimumScaleFactor(Constants.minScaleFactor)
                 .aspectRatio(1, contentMode: .fit)
-//                .rotationEffect(.radians(card.isMatched ? 2 * .pi : 0))
-//                .scaleEffect(card.isMatched ? 1.5 : 1)
-//                .animation(.easeInOut(duration: 1), value: card.isMatched)
             )
             .cardify(isFaceUp: card.isFaceUp, isMatched: card.isMatched)
     }

@@ -9,7 +9,7 @@ import Foundation
 
 
 struct MemorizeGameModel<CardConent: Equatable> {
-    
+
     var game: MemorizeGame<CardConent>
     let theme: Theme<CardConent>
     
@@ -22,17 +22,21 @@ struct MemorizeGameModel<CardConent: Equatable> {
         
         private(set) var cards: [Card]
         private(set) var score: Int = 0
+        
+        private var chosenCards: [Card] {
+            cards.filter { $0.isFaceUp }
+        }
+        
         var allMatched: Bool { cards.allSatisfy { $0.isMatched} }
         
         init(numberOfPairsOfCards: Int, cardsContents: [CardContent]) {
             cards = []
-            let shuffledConent = cardsContents.shuffled()
             for pairIndex in 0..<max(numberOfPairsOfCards, 2) {
-                let content = shuffledConent[pairIndex]
+                let content = cardsContents[pairIndex]
                 cards.append(Card(content: content, id: "\(pairIndex + 1)a"))
                 cards.append(Card(content: content, id: "\(pairIndex + 1)b"))
             }
-            cards.shuffle()
+//            cards.shuffle()
         }
         
         var indexOfOneAndOnly: Int? {
@@ -74,6 +78,31 @@ struct MemorizeGameModel<CardConent: Equatable> {
             }
         }
         
+//        mutating func choose(_ card: Card) {
+//            if let chosenIndex = index(of: card) {
+//                switch chosenCards.count {
+//                case 0:
+//                    cards[chosenIndex].isFaceUp = true
+//                case 1:
+//                    if chosenIndex != index(of: chosenCards[0]) {
+//                        cards[chosenIndex].isFaceUp = true
+//                    }
+//                case 2:
+//                    if Card.match(chosenCards) {
+//                        let index1 = index(of: chosenCards[0])!
+//                        let index2 = index(of: chosenCards[1])!
+//                        cards[index1].isMatched = true
+//                        cards[index1].isMatched = true
+//                        
+//                    }
+//                default:
+//                    break
+//                }
+//            } else {
+//                fatalError("no such index")
+//            }
+//        }
+        
         private func index(of card: Card) -> Int? {
             for index in cards.indices {
                 if cards[index].id == card.id {
@@ -85,13 +114,28 @@ struct MemorizeGameModel<CardConent: Equatable> {
         
         
         struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
+            
+            static func match(_ card1: Card, _ card2: Card) -> Bool{
+                return card1.content == card2.content
+            }
+            static func match(_ cards: [Card]) -> Bool {
+                return match(cards[0], cards[1])
+            }
+            
             var debugDescription: String {
                 return "\(id): \(content), \(isFaceUp ? "up" : "down") \(isMatched ? "matched" : "")"
             }
             
-            var isFaceUp = false
+            var isFaceUp = false {
+                didSet {
+                    if oldValue && !isFaceUp {
+                        alreadySeen = true
+                    }
+                }
+            }
             var isMatched = false
             var alreadySeen = false
+
             let content: CardContent
             
             var id: String
@@ -99,7 +143,6 @@ struct MemorizeGameModel<CardConent: Equatable> {
     }
     
     struct Theme<CardContent>: Identifiable {
-        
         
         let numberOfPairsOfCards: Int
         let content: [CardContent]
@@ -122,7 +165,6 @@ struct MemorizeGameModel<CardConent: Equatable> {
             self.init(name: name, numberOfPairsOfCards: numberOfPairsOfCards, content: content, color: color)
         }
     }
-    
 }
 
 extension Array {
@@ -130,6 +172,7 @@ extension Array {
         count == 1 ? first : nil
     }
 }
+
 
 extension MemorizeGameModel where CardConent == String {
     static let defaultThemes = [
