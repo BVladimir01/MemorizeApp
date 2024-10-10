@@ -78,31 +78,6 @@ struct MemorizeGameModel<CardConent: Equatable> {
             }
         }
         
-//        mutating func choose(_ card: Card) {
-//            if let chosenIndex = index(of: card) {
-//                switch chosenCards.count {
-//                case 0:
-//                    cards[chosenIndex].isFaceUp = true
-//                case 1:
-//                    if chosenIndex != index(of: chosenCards[0]) {
-//                        cards[chosenIndex].isFaceUp = true
-//                    }
-//                case 2:
-//                    if Card.match(chosenCards) {
-//                        let index1 = index(of: chosenCards[0])!
-//                        let index2 = index(of: chosenCards[1])!
-//                        cards[index1].isMatched = true
-//                        cards[index1].isMatched = true
-//                        
-//                    }
-//                default:
-//                    break
-//                }
-//            } else {
-//                fatalError("no such index")
-//            }
-//        }
-        
         private func index(of card: Card) -> Int? {
             for index in cards.indices {
                 if cards[index].id == card.id {

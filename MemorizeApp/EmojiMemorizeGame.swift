@@ -9,11 +9,15 @@ import SwiftUI
 
 class EmojiMemorizeGame: ObservableObject {
     
-    @Published private var gameModel = MemorizeGameModel<String>(theme: MemorizeGameModel.defaultTheme)
+    typealias StringGameModel = MemorizeGameModel<String>
+    typealias StringGame = StringGameModel.MemorizeGame<String>
+    typealias Card = StringGame.Card
     
-    var themes = MemorizeGameModel<String>.defaultThemes
+    @Published private var gameModel = StringGameModel(theme: MemorizeGameModel.defaultTheme)
     
-    var cards: [MemorizeGameModel<String>.MemorizeGame<String>.Card] {
+    var themes = StringGameModel.defaultThemes
+    
+    var cards: [Card] {
         return gameModel.game.cards
     }
     
@@ -25,32 +29,36 @@ class EmojiMemorizeGame: ObservableObject {
         gameModel.theme.id
     }
     
-    var theme: MemorizeGameModel<String>.Theme<String> {
+    var theme: StringGameModel.Theme<String> {
         gameModel.theme
     }
     
-    init(themes: [MemorizeGameModel<String>.Theme<String>] = MemorizeGameModel<String>.defaultThemes) {
-        self.themes = themes
-        self.gameModel = MemorizeGameModel<String>(theme: themes[0])
+    
+    var gameHasEnded: Bool {
+        cards.filter( { !$0.isMatched }).count == 0
     }
     
-    init(extraThemes: [MemorizeGameModel<String>.Theme<String>]) {
-        self.themes = MemorizeGameModel<String>.defaultThemes + extraThemes
-        self.gameModel = MemorizeGameModel<String>(theme: themes[0])
+    init(themes: [StringGameModel.Theme<String>] = StringGameModel.defaultThemes) {
+        self.themes = themes
+        self.gameModel = StringGameModel(theme: themes[0])
+    }
+    
+    init(extraThemes: [StringGameModel.Theme<String>]) {
+        self.themes = StringGameModel.defaultThemes + extraThemes
+        self.gameModel = StringGameModel(theme: themes[0])
     }
     
     // MARK: - Intents
     func newGame() {
-        var potentialNewTheme = themes.randomElement() ?? MemorizeGameModel<String>.defaultTheme
+        var potentialNewTheme = themes.randomElement() ?? StringGameModel.defaultTheme
         if potentialNewTheme.content.count < 2 {
-            potentialNewTheme = MemorizeGameModel<String>.defaultTheme
+            potentialNewTheme = StringGameModel.defaultTheme
         }
-        gameModel = MemorizeGameModel<String>(theme: potentialNewTheme)
+        gameModel = StringGameModel(theme: potentialNewTheme)
     }
     
-    func choose(_ card: MemorizeGameModel<String>.MemorizeGame<String>.Card) {
+    func choose(_ card: Card) {
         gameModel.game.choose(card)
-        if gameModel.game.allMatched {newGame()}
     }
     
 }

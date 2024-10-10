@@ -8,21 +8,30 @@
 import SwiftUI
 
 struct CardView: View {
-    let card: MemorizeGameModel<String>.MemorizeGame<String>.Card
+    
+    typealias StringGameModel = MemorizeGameModel<String>
+    typealias StringGame = StringGameModel.MemorizeGame<String>
+    typealias Card = StringGame.Card
+    
+    let card: Card
     
     var body: some View {
-        Pie(endAngle: Angle(degrees: 100))
-            .opacity(Constants.pieOpacity)
-            .overlay(
-                Text(card.content)
-                .font(.system(size: Constants.textFontSize))
-                .minimumScaleFactor(Constants.minScaleFactor)
-                .aspectRatio(1, contentMode: .fit)
-            )
+//        Pie(endAngle: Angle(degrees: 100))
+//            .opacity(Constants.pieOpacity)
+//            .overlay(
+//                Text(card.content)
+//                .font(.system(size: Constants.textFontSize))
+//                .minimumScaleFactor(Constants.minScaleFactor)
+//                .aspectRatio(1, contentMode: .fit)
+//            )
+        Text(card.content)
+        .font(.system(size: Constants.textFontSize))
+        .minimumScaleFactor(Constants.minScaleFactor)
+        .aspectRatio(1, contentMode: .fit)
             .cardify(isFaceUp: card.isFaceUp, isMatched: card.isMatched)
     }
     
-    init(_ card: MemorizeGameModel<String>.MemorizeGame<String>.Card) {
+    init(_ card: Card) {
         self.card = card
     }
     

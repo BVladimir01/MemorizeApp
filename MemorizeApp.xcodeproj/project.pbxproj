@@ -66,14 +66,14 @@
 			isa = PBXGroup;
 			children = (
 				E7F0BB7D2C9C3D3E007AD439 /* MemorizeApp.swift */,
+				E7F157D12C9D624A0003E05B /* MemorizeGame.swift */,
+				E7F157D32C9D64500003E05B /* EmojiMemorizeGame.swift */,
 				E7F0BB7F2C9C3D3E007AD439 /* MemorizeGameView.swift */,
 				E7B36C1F2CA595C0007D925E /* FlyingNumber.swift */,
 				E7B36C192CA56FA2007D925E /* CardView.swift */,
 				E7B36C1D2CA57380007D925E /* Pie.swift */,
 				E7B36C1B2CA570E1007D925E /* Cardify.swift */,
 				E7AA0BDE2CA1998500871354 /* AspectVGrid.swift */,
-				E7F157D12C9D624A0003E05B /* MemorizeGame.swift */,
-				E7F157D32C9D64500003E05B /* EmojiMemorizeGame.swift */,
 				E7F0BB812C9C3D41007AD439 /* Assets.xcassets */,
 				E7F0BB832C9C3D41007AD439 /* Preview Content */,
 			);
