@@ -9,16 +9,14 @@ import SwiftUI
 
 struct MemorizeGameView: View {
     
-    typealias StringGameModel = MemorizeGameModel<String>
-    typealias StringGame = StringGameModel.MemorizeGame<String>
+    typealias StringGame = MemorizeGame<String>
     typealias Card = StringGame.Card
     
     @ObservedObject var viewModel: EmojiMemorizeGame
-    
     @Namespace private var dealingNamespace
     
     var body: some View {
-        return VStack {
+        VStack {
             title
             cards
             controls
@@ -27,7 +25,12 @@ struct MemorizeGameView: View {
     }
     
     private var title: some View {
-        Text("Memorize \(viewModel.themeId)! \(viewModel.score)")
+        HStack {
+            Text("Memorize ")
+            Text("\(viewModel.theme.name)")
+                .foregroundStyle(Color(rgba: viewModel.theme.color))
+            Text("! \(viewModel.score)")
+        }
             .bold()
             .font(.largeTitle)
             .animation(nil)
@@ -35,7 +38,6 @@ struct MemorizeGameView: View {
     
     private var controls: some View {
         HStack {
-            Spacer()
             Button("NewGame") {
                 withAnimation {
                     viewModel.newGame()
@@ -43,7 +45,7 @@ struct MemorizeGameView: View {
             }
         }
         .font(.largeTitle)
-        .foregroundColor(Color(fromString: viewModel.theme.color))
+        .foregroundColor(Color(rgba: viewModel.theme.color))
     }
     
     private var cards: some View {
@@ -56,7 +58,7 @@ struct MemorizeGameView: View {
                     choose(card)
                 }
         }
-        .foregroundColor(Color(fromString: viewModel.theme.color))
+        .foregroundColor(Color(rgba: viewModel.theme.color))
     }
 
     private func choose (_ card: Card) {
@@ -95,5 +97,5 @@ struct MemorizeGameView: View {
 
 
 #Preview {
-    MemorizeGameView(viewModel: EmojiMemorizeGame())
+    MemorizeGameView(viewModel: EmojiMemorizeGame(theme: defaultTheme))
 }

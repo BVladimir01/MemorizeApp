@@ -9,61 +9,50 @@ import SwiftUI
 
 class EmojiMemorizeGame: ObservableObject {
     
-    typealias StringGameModel = MemorizeGameModel<String>
-    typealias StringGame = StringGameModel.MemorizeGame<String>
+    init(theme: Theme<String>) {
+        self.theme = theme
+        self.game = StringGame(theme: theme)
+    }
+    
+    typealias StringGame = MemorizeGame<String>
     typealias Card = StringGame.Card
     
-    @Published private var gameModel = StringGameModel(theme: MemorizeGameModel.defaultTheme)
-    
-    var themes = StringGameModel.defaultThemes
+    @Published private var game: StringGame
     
     var cards: [Card] {
-        return gameModel.game.cards
+        return game.cards
     }
     
     var score: Int {
-        gameModel.game.score
+        game.score
     }
     
-    var themeId: String {
-        gameModel.theme.id
+    var themeId: Theme<String>.ID {
+        theme.id
     }
     
-    var theme: StringGameModel.Theme<String> {
-        gameModel.theme
-    }
-    
+    var theme: Theme<String>
     
     var gameHasEnded: Bool {
         cards.filter( { !$0.isMatched }).count == 0
     }
     
-    init(themes: [StringGameModel.Theme<String>] = StringGameModel.defaultThemes) {
-        self.themes = themes
-        self.gameModel = StringGameModel(theme: themes[0])
-    }
-    
-    init(extraThemes: [StringGameModel.Theme<String>]) {
-        self.themes = StringGameModel.defaultThemes + extraThemes
-        self.gameModel = StringGameModel(theme: themes[0])
-    }
-    
     // MARK: - Intents
     func newGame() {
-        var potentialNewTheme = themes.randomElement() ?? StringGameModel.defaultTheme
-        if potentialNewTheme.content.count < 2 {
-            potentialNewTheme = StringGameModel.defaultTheme
-        }
-        gameModel = StringGameModel(theme: potentialNewTheme)
+//        var potentialNewTheme = defaultThemes.randomElement()!
+//        if potentialNewTheme.content.count < 2 {
+//            potentialNewTheme = defaultTheme
+//        }
+//        theme = potentialNewTheme
+//        game = StringGame(theme: potentialNewTheme)
+        game = StringGame(theme: theme)
     }
     
     func choose(_ card: Card) {
-        gameModel.game.choose(card)
+        game.choose(card)
     }
     
 }
-
-
 
 fileprivate extension Array where Element: Identifiable {
     subscript(id: Element.ID) -> Element? {

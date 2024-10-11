@@ -9,21 +9,12 @@ import SwiftUI
 
 struct CardView: View {
     
-    typealias StringGameModel = MemorizeGameModel<String>
-    typealias StringGame = StringGameModel.MemorizeGame<String>
+    typealias StringGame = MemorizeGame<String>
     typealias Card = StringGame.Card
     
     let card: Card
     
     var body: some View {
-//        Pie(endAngle: Angle(degrees: 100))
-//            .opacity(Constants.pieOpacity)
-//            .overlay(
-//                Text(card.content)
-//                .font(.system(size: Constants.textFontSize))
-//                .minimumScaleFactor(Constants.minScaleFactor)
-//                .aspectRatio(1, contentMode: .fit)
-//            )
         Text(card.content)
         .font(.system(size: Constants.textFontSize))
         .minimumScaleFactor(Constants.minScaleFactor)
@@ -43,7 +34,7 @@ struct CardView: View {
 }
 
 #Preview {
-    CardView(MemorizeGameModel.MemorizeGame.Card(isFaceUp: true, isMatched: false, alreadySeen: false, content: "⚽️", id: "X"))
+    CardView(MemorizeGame.Card(isFaceUp: true, isMatched: false, alreadySeen: false, content: "⚽️", id: "X"))
         .padding(20)
         .foregroundColor(.red)
 }

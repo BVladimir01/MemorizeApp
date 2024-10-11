@@ -39,7 +39,6 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
         atAspectRatio aspectRatio: CGFloat) -> CGFloat {
             var columnCount = 1.0
             let count = CGFloat(count)
-            print(count)
             repeat {
                 let width = size.width / columnCount
                 let height = width / aspectRatio
